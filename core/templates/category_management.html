@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Управление категориями</h1>
+    <h2>Список категорий</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Количество статей</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for category in categories %}
+            <tr>
+                <td>{{ category.name }}</td>
+                <td>{{ category.num_articles }}</td>
+                <td>
+                    <form method="post" action="{% url 'category_management' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_category" value="{{ category.id }}">
+                        <button type="submit" class="btn btn-danger" {% if category.num_articles > 0 %}disabled{% endif %}>
+                            Удалить
+                        </button>
+                    </form>
+                    
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+    <h2>Добавить новую категорию</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </form>
+{% endblock %}

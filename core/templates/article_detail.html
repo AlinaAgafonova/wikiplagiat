@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ article.title }}</h1>
+    <p>Автор: {{ article.author.username }}</p>
+    <p>Последние редакторы: {% for editor in article.editors.all %}{{ editor.username }}, {% endfor %}</p>
+    <p>{{ article.content|safe }}</p>
+    
+    {% if user.is_authenticated %}
+        {% if user.is_moderator or user.is_staff %}
+            <p>Статус: {% if article.is_locked %}Заблокирована{% else %}Открыта{% endif %}</p>
+            {% if article.is_locked %}
+                <p>Причина блокировки: {{ article.lock_reason }}</p>
+                <form action="{% url 'unlock_article' article.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Разблокировать</button>
+                </form>
+            {% else %}
+                <form action="{% url 'lock_article' article.pk %}" method="post">
+                    {% csrf_token %}
+                    <label for="lock_reason">Причина блокировки:</label>
+                    <input type="text" id="lock_reason" name="lock_reason">
+                    <button type="submit">Заблокировать</button>
+                </form>
+            {% endif %}
+        {% endif %}
+        
+        {% if article.author == user %}
+            <a href="{% url 'edit_article' article.pk %}">Редактировать</a>
+        {% endif %}
+        
+        {% if user.is_moderator or user.is_staff %}
+            <form action="{% url 'delete_article' article.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Удалить</button>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Панель администратора</h1>
+    <h2>Заявки на статус модератора</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Причина</th>
+                <th>Дата</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in moderator_requests %}
+                <tr>
+                    <td>{{ request.email }}</td>
+                    <td>{{ request.reason }}</td>
+                    <td>{{ request.created_at }}</td>
+                    <td>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="request_id" value="{{ request.id }}">
+                            <button type="submit" name="action" value="approve" class="btn btn-success">Одобрить</button>
+                            <button type="submit" name="action" value="reject" class="btn btn-danger">Отклонить</button>
+                            <br>
+                            {% if action == 'reject' %}
+                                <textarea name="rejection_reason" placeholder="Причина отклонения" class="form-control"></textarea>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Список модераторов</h2>
+    <ul class="list-group">
+        {% for moderator in moderators %}
+            <li class="list-group-item">{{ moderator.username }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

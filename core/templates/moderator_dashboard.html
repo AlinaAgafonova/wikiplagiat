@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Панель модератора</h1>
+    <h2>Ваши статьи</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Заголовок</th>
+                <th>Статус</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in articles %}
+                <tr>
+                    <td><a href="{% url 'article_detail' article.id %}">{{ article.title }}</a></td>
+                    <td>{% if article.is_locked %}Заблокирована{% else %}Открыта{% endif %}</td>
+                    <td>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="article_id" value="{{ article.id }}">
+                            {% if article.is_locked %}
+                                <button type="submit" name="action" value="unlock" class="btn btn-success">Разблокировать</button>
+                            {% else %}
+                                <button type="submit" name="action" value="lock" class="btn btn-danger">Заблокировать</button>
+                                <input type="text" name="lock_reason" placeholder="Причина блокировки" class="form-control">
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Заблокированные статьи</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Заголовок</th>
+                <th>Причина блокировки</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in locked_articles %}
+                <tr>
+                    <td><a href="{% url 'article_detail' article.id %}">{{ article.title }}</a></td>
+                    <td>{{ article.lock_reason }}</td>
+                    <td>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="article_id" value="{{ article.id }}">
+                            <button type="submit" name="action" value="unlock" class="btn btn-success">Разблокировать</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

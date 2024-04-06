@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Редактировать статью</h1>
+    {% if article.is_locked %}
+        <div class="alert alert-danger">Эта статья заблокирована и не может быть отредактирована.</div>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+    {% endif %}
+{% endblock %}
